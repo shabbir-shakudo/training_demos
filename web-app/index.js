@@ -13,7 +13,19 @@ function escapeHtml(str) {
   }[c]));
 }
 
+function log(msg) {
+  console.log(`[${new Date().toISOString()}] ${msg}`);
+}
+
 const server = http.createServer((req, res) => {
+  // Log incoming request
+  log(`Incoming request: ${req.method} ${req.url} from ${req.socket.remoteAddress || 'unknown'}`);
+
+  // Log when the response has been sent
+  res.on('finish', () => {
+    log(`Response sent: ${res.statusCode} for ${req.method} ${req.url}`);
+  });
+
   const parsed = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
   const pathname = parsed.pathname;
 
@@ -45,5 +57,5 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(port, () => {
-  console.log(`Server listening on http://localhost:${port}`);
+  log(`Server listening on http://localhost:${port}`);
 });
